@@ -1,0 +1,328 @@
+* { box-sizing: border-box; }
+
+body {
+    background: #000;
+    color: #FFF;
+
+    font-family: Arial, sans-sans-serif;
+    font-size: 16px;
+    
+    overflow: hidden;
+    margin: 0px;
+    padding: 0px;
+}
+input[type=text] { font-size: 16px; }
+
+button {
+    display: inline-block; vertical-align: top;
+    padding: 7px;
+    background: #BBB; border: 1px solid #BBB;
+    color: #000;
+    cursor: pointer;
+}
+button:hover { background: #CCC; }
+button:active { background: #CCC; }
+button.active { background: #EEE; border: 1px solid #DDD; cursor: default; }
+button.largeButton {
+    width: 350px;
+    display: block;
+    margin: 25px auto;
+    padding: 15px 7px;
+}
+
+
+.screen {
+    display: block;
+    position: relative;
+    
+    width: 1280px;
+    height: 98vh;
+    margin: 1vh auto;
+    
+    overflow-x: hidden;
+    overflow-y: auto;
+    
+    background: #FFF;
+    color: #000;
+    border: 0px solid #333;
+    padding: 0px;
+}
+
+h1 { margin: 20px 0px; padding: 0px; font-size: 24pt; }
+h2 { margin: 15px 0px; padding: 0px; font-size: 18pt; }
+h3 { margin: 10px 0px; padding: 0px; font-size: 15pt; }
+h4 { margin: 5px 0px; padding: 0px; font-size: 11pt; font-weight: bold; }
+
+.choice {
+    display: inline-block; vertical-align: top; width: 250px; height: 125px;
+    padding: 5px; margin: 0px 0px 5px 5px;
+    background: #EEE;
+    cursor: pointer;
+}
+.choice:hover { background: #DDD; }
+.selected { background: #ACA; }
+
+.menu.screen {
+    padding: 25px;
+    text-align: center;
+}
+.menu.screen>label {
+    background: #EEE;
+    display:block;
+    margin: auto;
+    width: 95%;
+    padding: 5px;
+    text-align: center;
+}
+.menu.screen>input,.menu.screen>select {
+    display:block;
+    margin: auto;
+    margin-bottom: 25px;
+    width: 95%;
+    padding: 5px;
+    text-align: center;
+}
+
+
+.event.screen {
+    
+}
+.event.screen .backgroundImageContainer {
+    position: absolute;
+    top:0px;left:0px;right:0px;bottom:0px;
+    background: #A00;
+}
+.event.screen .backgroundImage {
+    width: 100%;
+    height: 100%;
+}
+.event.screen .textOverlay {
+    position: absolute;
+    top:0px;left:0px;right:0px;height:auto;
+    padding: 15px;
+    background: rgba(255,255,255,0.75);
+}
+
+
+.main.screen .mainMenu {
+    margin: 0px; padding: 5px;
+    background: #FFF;
+    vertical-align: middle;
+    line-height: 30px;
+}
+.main.screen .mainMenu_left {
+    
+}
+.main.screen .mainMenu_right {
+    float:right;
+}
+.main.screen .mainMenuBtn {}
+.main.screen .infoBox {
+    display: inline-block; vertical-align: top;
+    padding: 7px 7px; margin-right: 5px;
+    background: none; border: none;
+    color: #000;
+}
+
+.main.screen .splash {
+    padding: 40px; height: auto;
+    background: #EEE;
+}
+.main.screen .splash_title {
+    font-size: 26px; margin: 10px auto; width: 700px;
+}
+.main.screen .splash_text {
+    margin: 10px auto; width: 700px;
+}
+.main.screen .splash_actions {
+    margin: 10px auto; width: 700px;
+}
+.main.screen .splash_action {
+    display: inline-block; vertical-align: top;
+    padding: 8px 15px; margin: 0px; margin-right: 5px;
+    background: #BBB; border: none;
+    cursor: pointer;
+}
+.main.screen .splash_action:hover { background: #CCC; }
+.main.screen .splash_action:active { background: #CCC; }
+.main.screen .notes {
+    text-align: center;
+}
+.main.screen .note {
+    display: inline-block; position: relative; vertical-align: top;
+    margin: 5px; padding: 7px; width: 330px; height: auto; overflow-y: hidden;
+    border: 1px solid #999; border-left: 7px solid red;
+    color: #000; background: #d5d5d5;
+    cursor:pointer; text-align: left;
+}
+    .main.screen .note.bad {        border-left-color: #C55; }
+    .main.screen .note.iffy {       border-left-color: #CC5; }
+    .main.screen .note.good {       border-left-color: #5C5; }
+    .main.screen .note.neutral {    border-left-color: #999; }
+.main.screen .note:hover { border-right-color: #000; border-top-color: #000; border-bottom-color: #000; }
+.main.screen .note.active { background: #f0f0f0; }
+.main.screen .title { }
+.main.screen .text { display: none; }
+.main.screen .actions { display: none; }
+
+
+
+
+.schedule.screen {
+    display: flex;
+    flex-direction: column;
+}
+.schedule.screen .searchContainer {
+    height: 60px;
+    padding: 25px; background: #EEE; border-bottom: 3px #999;
+}
+.schedule.screen .searchBox {
+    display: block;
+    margin: 0px auto; width: 400px;
+    background: none; border: none;
+    border-bottom: 1px solid #999;
+    text-align: center;
+}
+.schedule.screen .buyContainer {
+    flex: 1 10 auto;
+    display: flex;
+}
+.schedule.screen .leftCol {
+    width: 200px;
+    background: #eee; border-right: 1px solid #999;
+    overflow-y: auto;
+    /*flex: 1 1 auto;*/
+}
+.schedule.screen .list {
+
+}
+.schedule.screen .listItem {
+    padding: 12px;
+    background: #DDD; border-bottom: 1px solid #999;
+    cursor: pointer;
+}
+.schedule.screen .listItem:hover { background: #EEE; }
+.schedule.screen .listItem.active {
+    background: #FFF;
+}
+.schedule.screen .listItem.blocked { background: #FEE; color: #700; }
+.schedule.screen .listItem.blocked>.note { margin-top: 3px; font-size: 10pt; }
+
+.schedule.screen .MainCol {
+    flex: 1 10 auto;
+    padding: 40px;
+    background: #FFF;
+}
+.schedule.screen .activityContainer {
+    border-bottom: 1px solid #999; width: 100%;
+    margin: 10px; padding: 0px; padding-bottom: 7px;
+}
+
+.schedule.screen .activityTimeContainer {
+    display: inline-block; width: 120px; vertical-align: top;
+    text-align: center;
+    padding-top: 0px;
+}
+.schedule.screen .dayTimeBtn {
+    padding: 0px; margin: 0px; text-align: center; width: 40px; height: 30px;
+}
+.schedule.screen .unchangable .dayTimeBtn { display: none; }
+.schedule.screen .dayTimeValue {
+    display:inline-block;
+    padding: 0px; padding-top: 7px; margin: 0px; text-align: center; width: 40px; height: 30px;
+}
+.schedule.screen .unchangable.dayTimeValue { width: 120px; }
+.schedule.screen .activityText {
+    display:inline-block; vertical-align: top;
+    padding-top: 7px; padding-left: 15px; margin: 0px;
+}
+.schedule.screen .activityName {
+    display:block;
+    padding: 0px; margin: 0px; width: 100%;
+}
+.schedule.screen .activityDesc {
+    display:block;
+    padding: 0px; margin: 0px; margin-top: 7px; width: 100%;
+    font-size: 12px;
+}
+.schedule.screen .hoursTotal {
+    padding: 40px; text-align: left; font-size: 20px; background: #eee;
+}
+
+
+
+.screen.buy {
+    display: flex;
+    flex-direction: column;
+}
+.screen.buy .searchContainer {
+    height: 60px;
+    padding: 25px; background: #EEE; border-bottom: 3px #999;
+}
+.screen.buy .searchBox {
+    display: block;
+    margin: 0px auto; width: 400px;
+    background: none; border: none;
+    border-bottom: 1px solid #999;
+    text-align: center;
+}
+.screen.buy .buyContainer {
+    flex: 1 10 auto;
+    display: flex;
+}
+.screen.buy .leftCol {
+    width: 200px;
+    background: #eee; border-right: 1px solid #999;
+    overflow-y: auto;
+    /*flex: 1 1 auto;*/
+}
+
+.screen.buy .list {
+
+}
+.screen.buy .listItem {
+    padding: 12px;
+    background: #DDD; border-bottom: 1px solid #999;
+    cursor: pointer;
+}
+.screen.buy .listItem:hover { background: #EEE; }
+.screen.buy .listItem.active {
+    background: #FFF;
+}
+
+.screen.buy .listHeading {
+    padding: 12px;
+    text-align: center;
+    background: #eee;
+    font-weight: bold;
+}
+
+.screen.buy .MainCol {
+    flex: 1 10 auto;
+    padding: 40px;
+    background: #FFF;
+}
+.screen.buy .title {
+    font-size: 28px;
+}
+.screen.buy .price {
+
+}
+.screen.buy .actions {
+    margin: 10px 0px;
+}
+.screen.buy .description {
+
+}
+.screen.buy .activityList {
+    margin: 10px;
+    padding: 10px;
+    background: #DDD;
+}
+.screen.buy .activity {
+    margin: 5px;
+    padding: 5px;
+    background: #EEE;
+}
+
+

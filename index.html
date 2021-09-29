@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Welcome To The Real World</title>
+<link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+<div id="vueContainer">
+    <!-- <h1>Main Menu</h1> ------------------------------------------------------------------>
+    <div class="screen menu" v-if="state.ui.currentScreen==='mainMenu'">
+        <h1>New Game</h1>
+        
+        <label for="firstName">First Name</label><input type="text" id="firstName" v-model="state.firstName" />
+        
+        <label for="lastName">Last Name</label><input type="text" id="lastName" v-model="state.lastName" />
+        
+        <label for="region">Location</label><select id="region" v-model="state.location">
+            <option v-for="location in content.locations" v-bind:value="location.id">{{location.name}}</option>
+        </select>
+        
+        <h2>Difficulty</h2>
+        <p>Difficulty will impact how many needs you have to juggle, how much luck is on your side how much money you start with and more.</p>
+        <div class="difficultiesContainer">
+            <div class="choice" v-bind:class="{selected: (state.difficulty===difficulty.id)}" v-on:click="menu_selectDifficulty(difficulty.id);" v-for="difficulty in content.difficulties">
+                <h3>{{difficulty.name}}</h3>
+                <p>{{difficulty.description}}</p>
+            </div>
+        </div>
+        
+        <h2>Needs ({{countNeedsChosen}} / {{countNeedsNeeded}})</h2>
+        <p>Based on the difficulty you selected, you need to choose {{countNeedsNeeded}} needs. Choose more if you'd like, but each need adds more things you have to keep in balance while playing.</p>
+        <div class="needsContainer">
+            <div class="choice" v-bind:class="{selected: isNeedSelected(need.id)}" v-on:click="menu_toggleNeed(need.id);" v-for="need in chooseableNeeds">
+                <h3>{{need.name}}</h3>
+                <p>{{need.description}}</p>
+            </div>
+        </div>
+        
+        <button class="largeButton" v-on:click="gameStart()">Start Game</button>
+    </div>
+    
+    <!-- <h1>Main Play Screen</h1> ------------------------------------------------------------------>
+    <div class="screen main" v-if="state.ui.currentScreen==='overview'">
+        <nav class="mainMenu">
+            <div class="mainMenu_right">
+                <button class="mainMenuBtn active" v-on:click="toggleScreen('overview');">Overview</button>
+                <button class="mainMenuBtn" v-on:click="toggleScreen('schedule');">Schedule</button>
+                <button class="mainMenuBtn" v-on:click="toggleScreen('inventory');">Inventory</button>
+                <!-- TODO: What's this about? <button class="mainMenuBtn">Bank</button> -->
+                <button class="mainMenuBtn" v-on:click="nextTurn()">Next turn</button>
+                Turn {{state.turn}}
+            </div>
+            <div class="mainMenu_left">
+                <button class="mainMenuBtn" v-on:click="gameNew()">New game</button>
+                <!-- <button class="mainMenuBtn" v-on:click="gameSave()">Save</button> -->
+                <!-- <button class="mainMenuBtn" v-on:click="gameLoad()">Load</button> -->
+                <!-- <button class="mainMenuBtn" v-on:click="gameLogout()">Log out</button> -->
+                <button class="mainMenuBtn" v-on:click="gameAbout()">About</button>
+            </div>
+        </nav>
+        
+        <div class="splash" v-if="state.ui.overview.activeNeed">
+            <div class="splash_title">{{state.ui.overview.activeNeed.name}}</div>
+            <div class="splash_text">{{state.ui.overview.activeNeed.description}}<br/><br/>{{state.ui.overview.activeNeed.help}}</div>
+            <div class="splash_actions" v-if="typeof state.ui.overview.activeNeed.hideButton === 'undefined'"><button class="splash_action" v-on:click="switchToActionsForNeed(state.ui.overview.activeNeed)">Take action</button></div>
+        </div>
+        
+        <div class="notes">
+            <div class="note" v-bind:class="{ good:rateTime('good'), iffy:rateTime('iffy'), bad:rateTime('bad') }" v-on:click="overview_show_time()">
+                <div class="title">Time</div>
+                <div class="text">(105/168)</div>
+                <div class="actions"></div>
+            </div><div class="note" v-bind:class="{ good:rateMoney('good'), iffy:rateMoney('iffy'), bad:rateMoney('bad') }" v-on:click="overview_show_money()">
+                <div class="title">Money</div>
+                <div class="text">$2052.40</div>
+                <div class="actions"></div>
+            </div><div class="note" v-bind:class="{ good:rateNeed(need,'good'), iffy:rateNeed(need,'iffy'), bad:rateNeed(need,'bad') }" v-for="need in state.needs" v-on:click="overview_show_need(need)">
+                <div class="title">Need: {{need.name}}</div>
+                <div class="text">{{need.description}}</div>
+                <div class="actions"><button class="action">Shop #rest</button><button class="action">Schedule #rest</button></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- <h1>Schedule Screen</h1> ------------------------------------------------------------------>
+    <div class="screen schedule" v-if="state.ui.currentScreen==='schedule'">
+        <!-- TODO: Have a search? <div class="searchContainer"><input type="text" class="searchBox" value="" placeholder="search" /></div> -->
+        <div class="buyContainer">
+            <div class="leftCol">
+                <div class="list">
+                    <div v-for="(stuff,need) in scheduleNav" class="listItem" v-bind:class="{ active: need===state.ui.schedule.activeCat }" v-on:click="state.ui.schedule.activeCat=need">{{need}}</div>
+                </div>
+            </div>
+            <div class="leftCol">
+                <div class="list">
+                    <div v-for="(objReqs,action) in scheduleNav[state.ui.schedule.activeCat]['doable']" class="listItem" v-on:click="addPerformance(action)">{{action}}</div>
+                    <div v-for="(objReqs,action) in scheduleNav[state.ui.schedule.activeCat]['blocked']" class="listItem blocked">{{action}}
+                        <div class="note" v-for="objReq in objReqs">Need: {{objReq.join(", ")}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="MainCol">
+                <div class="activityContainer unchangable">
+                    <div class="activityTimeContainer">
+                        <button class="dayTimeBtn disabled">-</button><span class="dayTimeValue">0</span><button class="dayTimeBtn">+</button>
+                    </div><div class="activityText">
+                        <div class="activityName">Transportation</div>
+                        <div class="activityDesc">Automatically calculated based on your activities for the week<br/>6 travels from work and go to movies</div>
+                    </div>
+                </div>
+                <div class="activityContainer" v-for="perf in state.pendingActions">
+                    <div class="activityTimeContainer">
+                        <button class="dayTimeBtn" v-on:click="scheduleItemLess(perf)">-</button><span class="dayTimeValue">{{perf.amount}}</span><button class="dayTimeBtn" v-on:click="scheduleItemMore(perf)">+</button>
+                    </div><div class="activityText">
+                        <div class="activityName">{{perf.action.name}}</div>
+                        <div class="activityDesc">{{perf.action.description}}</div>
+                    </div>
+                </div>
+
+                <div class="hoursTotal">{{scheduledTimeCount}} / 168 hours (1 week)</div>
+                
+                <button class="largeButton" v-on:click="toggleScreen('overview');">Done</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- <h1>Buy Screen</h1> ------------------------------------------------------------------>
+    <div class="screen buy" v-if="state.ui.currentScreen==='inventory'">
+        <!-- TODO: Have a search? <div class="searchContainer"><input type="text" class="searchBox" value="" placeholder="search" /></div> -->
+        <div class="buyContainer">
+            <div class="leftCol">
+                <div class="list">
+                    <div v-for="(stuff,need) in inventoryNav" class="listItem" v-bind:class="{ active: need===state.ui.inventory.activeCat }" v-on:click="state.ui.inventory.activeCat=need">{{need}}</div>
+                </div>
+            </div>
+            <div class="leftCol">
+                <div class="list">
+                    <div class="listHeading">My things</div>
+                    <div v-for="item in inventoryNav[state.ui.inventory.activeCat]['have']" class="listItem" v-on:click="showInventoryItem(item,true)">(owned) {{item.name}}</div>
+                    <div v-if="inventoryNav[state.ui.inventory.activeCat]['have'].length === 0"><br/><br/></div>
+                    <div class="listHeading">Available</div>
+                    <div v-for="item in inventoryNav[state.ui.inventory.activeCat]['available']" class="listItem" v-on:click="showInventoryItem(item,false)">{{item.name}}</div>
+                </div>
+            </div>
+            <div class="MainCol" v-for="item in [this.state.ui.inventory.activeItem]">
+                <div v-if="state.ui.inventory.activeItem !==null">
+                    <div class="title">{{item.name}}</div>
+                    <div class="description">{{item.description}}</div>
+                    <div class="activityList">Activities this item enables:
+                        <div class="activity">Transportation</div>
+                        <div class="activity">Go for a drive</div>
+                    </div>
+                    
+                    <div v-if="state.ui.inventory.activeItemIsOwned===true">
+                        <div class="price">
+                            <span v-if="item.terms.lumpCost !== 0"><span v-if="item.terms.lumpCost < 0">+</span>${{Math.abs(item.terms.lumpCost)}}</span>
+                            <span v-if="item.terms.lumpCost > 0 && item.terms.ongoingCost > 0">, </span>
+                            <span v-if="item.terms.ongoingCost !== 0"><span v-if="item.terms.ongoingCost < 0">+</span>${{Math.abs(item.terms.ongoingCost)}}/mo.</span>
+                        </div>
+                        <div class="actions">
+                            <div v-if="false === item.terms.uitextTerminate">Contract terms prevent you from selling this item right now.</div>
+                            <div v-if="false !== item.terms.uitextTerminate"><button v-on:click="inventoryRemove">{{item.terms.uitextTerminate}}</button></div>
+                        </div>
+                    </div>
+                    <div v-if="state.ui.inventory.activeItemIsOwned===false">
+                        <div class="price">
+                            <span v-if="item.terms.lumpCost !== 0"><span v-if="item.terms.lumpCost < 0">+</span>${{Math.abs(item.terms.lumpCost)}}</span>
+                            <span v-if="item.terms.lumpCost > 0 && item.terms.ongoingCost > 0">, </span>
+                            <span v-if="item.terms.ongoingCost !== 0"><span v-if="item.terms.ongoingCost < 0">+</span>${{Math.abs(item.terms.ongoingCost)}}/mo.</span>
+                        </div>
+                        <div class="actions">
+                            <div v-if="false === item.terms.uitextAcquire">Contract terms prevent you from buying this item right now.</div>
+                            <div v-if="false !== item.terms.uitextAcquire"><button v-on:click="inventoryAdd">{{item.terms.uitextAcquire}}</button></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="largeButton" v-on:click="toggleScreen('overview');">Done</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- <h1>Event Screen</h1> ------------------------------------------------------------------>
+    <div class="screen event" v-if="state.ui.currentScreen==='event'">
+        <img class="backgroundImage" v-bind:src="state.currentEvent.backgroundImageSrc" v-bind:alt="state.currentEvent.backgroundImageAlt" />
+        <div class="textOverlay">
+            <h1>{{state.currentEvent.title}}</h1>
+            <p>{{state.currentEvent.description}}</p>
+            <div class="choice" v-for="response in state.currentEvent.responses"><h3>{{response.name}}</h3><p>{{response.description}}</p></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="js/content.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+</body>
+</html>
